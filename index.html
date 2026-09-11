@@ -6,8 +6,10 @@
 <style>
 :root {
   --navy: #002F72;
-  --blue: #0057B8;
-  --blue-light: #E8F1FB;
+  --green: #C7D500;
+  --green-dark: #6AC200;
+  --blue: #67B3DC;
+  --blue-light: #E1ECF5;
   --surface: #FFFFFF;
   --surface-alt: #F0F5FD;
   --body-bg: #EBF1FA;
@@ -101,7 +103,7 @@ body {
 .header-name { font-weight: 700; font-size: 15px; color: white; }
 .header-sub { font-size: 11.5px; color: rgba(255,255,255,0.6); margin-top: 1px; }
 .header-status { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: rgba(255,255,255,0.65); }
-.status-dot { width: 7px; height: 7px; background: #4ADE80; border-radius: 50%; box-shadow: 0 0 0 2px rgba(74,222,128,0.3); }
+.status-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 0 2px rgba(199,213,0,0.35); }
 
 /* ── Messages ── */
 .chat-messages {
@@ -233,13 +235,13 @@ body {
 .form-field input:focus { border-color: var(--blue); }
 .form-submit {
   margin-top: 10px; width: 100%;
-  padding: 9px; background: var(--navy);
-  color: white; border: none; border-radius: 8px;
-  font-size: 13px; font-weight: 600;
+  padding: 9px; background: var(--green);
+  color: var(--navy); border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 700;
   cursor: pointer; font-family: inherit;
   transition: background 0.15s;
 }
-.form-submit:hover { background: var(--blue); }
+.form-submit:hover { background: var(--green-dark); color: white; }
 
 /* ── Suggestions ── */
 .suggestions {
@@ -273,7 +275,7 @@ body {
   transition: all 0.15s; white-space: nowrap;
 }
 .qual-btn:hover { background: var(--blue-light); border-color: var(--blue); }
-.qual-btn.selected { background: var(--navy); color: white; border-color: var(--navy); }
+.qual-btn.selected { background: var(--green); color: var(--navy); border-color: var(--green); font-weight: 700; }
 
 /* ── Input area ── */
 .chat-input-area {
@@ -299,16 +301,16 @@ body {
 .input-field::placeholder { color: var(--text-muted); }
 .send-btn {
   width: 40px; height: 40px;
-  border-radius: 50%; background: var(--navy);
+  border-radius: 50%; background: var(--green);
   border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s, transform 0.1s;
 }
-.send-btn:hover { background: var(--blue); transform: scale(1.05); }
+.send-btn:hover { background: var(--green-dark); transform: scale(1.05); }
 .send-btn:active { transform: scale(0.95); }
 .send-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
-.send-btn svg { fill: white; }
+.send-btn svg { fill: var(--navy); }
 .input-hint {
   font-size: 11px; color: var(--text-muted);
   text-align: center; margin-top: 7px;
@@ -443,7 +445,7 @@ function handleInactivity() {
   btns.id = 'email-prompt-btns';
   btns.style.cssText = 'padding: 4px 16px 4px 54px; display:flex; gap:8px; animation: pop 0.25s ease;';
   btns.innerHTML = `
-    <button class="chip" style="background:var(--navy);color:white;border-color:var(--navy);" onclick="showEmailForm()">Oui, je veux le récapitulatif</button>
+    <button class="chip" style="background:var(--green);color:var(--navy);border-color:var(--green);font-weight:700;" onclick="showEmailForm()">Oui, je veux le récapitulatif</button>
     <button class="chip" onclick="declineEmail()">Non merci</button>`;
   el('messages').appendChild(btns);
   scroll();
@@ -829,7 +831,7 @@ el('inputField').disabled = true;
 el('sendBtn').disabled = true;
 
 setTimeout(() => {
-  addMsg('sarah', 'Bonjour, je suis Sarah, assistante IA en formation 🤖 — je suis actuellement en phase de démonstration et mes réponses sont à titre indicatif. Pour toute situation complexe, nos conseillers humains restent à votre disposition.\n\nAvant de commencer, merci de vous présenter :');
+  addMsg('sarah', 'Bonjour, je suis Sarah, assistante IA en formation 🤖\n\nAvant de commencer, merci de vous présenter :');
   const formWrapper = document.createElement('div');
   formWrapper.style.cssText = 'padding: 0 16px 0 54px; animation: pop 0.3s ease;';
   formWrapper.innerHTML = intakeForm();
