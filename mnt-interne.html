@@ -395,8 +395,15 @@ body {
       </select>
     </div>
     <div class="filter-group">
-      <div class="filter-label">Employeur / CDG</div>
-      <input class="filter-input" id="f-employeur" type="text" placeholder="ex : CDG 66, CDG 34…">
+      <div class="filter-label">Document source</div>
+      <select class="filter-select" id="f-employeur">
+        <option value="">Tous les documents</option>
+        <option value="2027-DEPLIANT_AGENTS_SANTE_CDG38_V2.pdf">CDG 38 — Isère</option>
+        <option value="convention-de-participation-cdg66-MNT-2026-2031.pdf">CDG 66 — Pyrénées-Orientales</option>
+        <option value="Delib2024-41_Avenant-PSC-SANTE-MNT_Annexe.pdf">CDG 16 — Charente</option>
+        <option value="tableaux-neobsia_prestations.pdf">GFO Néobsia</option>
+        <option value="rm pour test rag.pdf">RM Santé (test)</option>
+      </select>
     </div>
     <button class="filter-reset" onclick="resetFilters()">↺ Réinitialiser</button>
   </div>
@@ -460,7 +467,16 @@ function addResult(query, answer, sources, filters) {
   const metaTags = [];
   if (filters.produit)   metaTags.push(filters.produit === 'sante' ? '💊 Santé' : '🏥 Prévoyance');
   if (filters.contrat)   metaTags.push(filters.contrat === 'individuel' ? '👤 Individuel' : '🏛️ Convention');
-  if (filters.employeur) metaTags.push('🏢 ' + filters.employeur);
+  if (filters.employeur) {
+    const docLabels = {
+      '2027-DEPLIANT_AGENTS_SANTE_CDG38_V2.pdf': 'CDG 38 — Isère',
+      'convention-de-participation-cdg66-MNT-2026-2031.pdf': 'CDG 66 — Pyrénées-Orientales',
+      'Delib2024-41_Avenant-PSC-SANTE-MNT_Annexe.pdf': 'CDG 16 — Charente',
+      'tableaux-neobsia_prestations.pdf': 'GFO Néobsia',
+      'rm pour test rag.pdf': 'RM Santé (test)'
+    };
+    metaTags.push('📄 ' + (docLabels[filters.employeur] || filters.employeur));
+  }
   const metaHtml = metaTags.length
     ? `<div class="result-meta">${metaTags.map(t => `<span class="meta-tag">${t}</span>`).join('')}</div>`
     : '';
