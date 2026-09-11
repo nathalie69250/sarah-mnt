@@ -1,0 +1,839 @@
+<title>Sarah — Assistant MNT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+
+<style>
+:root {
+  --navy: #002F72;
+  --blue: #0057B8;
+  --blue-light: #E8F1FB;
+  --surface: #FFFFFF;
+  --surface-alt: #F0F5FD;
+  --body-bg: #EBF1FA;
+  --sarah-bg: #E8F1FB;
+  --user-bg: #002F72;
+  --user-text: #FFFFFF;
+  --text-primary: #1A2844;
+  --text-secondary: #5A6A8A;
+  --text-muted: #90A3C0;
+  --border: #D8E4F5;
+  --shadow: rgba(0,47,114,0.12);
+  --radius: 14px;
+  --radius-sm: 4px;
+  --radius-lg: 22px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --body-bg: #0C1628;
+    --surface: #152035;
+    --surface-alt: #1B2B47;
+    --sarah-bg: #1A2E4A;
+    --text-primary: #E2EAF8;
+    --text-secondary: #8AAACE;
+    --text-muted: #5070A0;
+    --border: #243554;
+    --shadow: rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"] {
+  --body-bg: #0C1628;
+  --surface: #152035;
+  --surface-alt: #1B2B47;
+  --sarah-bg: #1A2E4A;
+  --text-primary: #E2EAF8;
+  --text-secondary: #8AAACE;
+  --text-muted: #5070A0;
+  --border: #243554;
+  --shadow: rgba(0,0,0,0.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--body-bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.chat-wrapper {
+  width: 100%;
+  max-width: 900px;
+  height: min(860px, calc(100vh - 32px));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 48px var(--shadow);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.chat-header {
+  background: var(--navy);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.header-logo {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: white;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+.header-info { flex: 1; }
+.header-name { font-weight: 700; font-size: 15px; color: white; }
+.header-sub { font-size: 11.5px; color: rgba(255,255,255,0.6); margin-top: 1px; }
+.header-status { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: rgba(255,255,255,0.65); }
+.status-dot { width: 7px; height: 7px; background: #4ADE80; border-radius: 50%; box-shadow: 0 0 0 2px rgba(74,222,128,0.3); }
+
+/* ── Messages ── */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 88%;
+  animation: pop 0.22s ease;
+}
+@keyframes pop {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.message.user { align-self: flex-end; flex-direction: row-reverse; }
+.message.sarah { align-self: flex-start; }
+
+.avatar {
+  width: 30px; height: 30px;
+  background: var(--blue);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: white;
+  flex-shrink: 0; margin-bottom: 2px;
+}
+
+.bubble {
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  line-height: 1.65;
+  word-break: break-word;
+}
+.sarah .bubble {
+  background: var(--sarah-bg);
+  color: var(--text-primary);
+  border-bottom-left-radius: var(--radius-sm);
+}
+.user .bubble {
+  background: var(--user-bg);
+  color: var(--user-text);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+/* markdown inside bubble */
+.bubble h3, .bubble h4 { font-size: 13px; font-weight: 700; margin: 10px 0 4px; color: var(--navy); }
+.user .bubble h3, .user .bubble h4 { color: white; }
+.bubble strong { font-weight: 600; }
+.bubble ul, .bubble ol { padding-left: 18px; margin: 5px 0; }
+.bubble li { margin: 3px 0; }
+.bubble p { margin: 4px 0; }
+.bubble p:first-child { margin-top: 0; }
+.bubble p:last-child { margin-bottom: 0; }
+.bubble hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+/* ── Typing ── */
+.typing-indicator {
+  display: flex; align-items: center; gap: 8px;
+  align-self: flex-start; animation: pop 0.2s ease;
+}
+.typing-bubble {
+  background: var(--sarah-bg);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border-bottom-left-radius: var(--radius-sm);
+  display: flex; gap: 5px; align-items: center;
+}
+.typing-dot {
+  width: 7px; height: 7px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ── Contact form ── */
+.contact-form {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-top: 10px;
+  animation: pop 0.25s ease;
+}
+.contact-form-title {
+  font-size: 12.5px; font-weight: 700;
+  color: var(--navy); margin-bottom: 11px;
+  display: flex; align-items: center; gap: 5px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.form-field { display: flex; flex-direction: column; gap: 3px; }
+.form-field.full { grid-column: 1 / -1; }
+.form-field label {
+  font-size: 10.5px; font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.form-field input {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.form-field input:focus { border-color: var(--blue); }
+.form-submit {
+  margin-top: 10px; width: 100%;
+  padding: 9px; background: var(--navy);
+  color: white; border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.15s;
+}
+.form-submit:hover { background: var(--blue); }
+
+/* ── Suggestions ── */
+.suggestions {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  align-self: flex-start; padding: 0 0 4px 38px;
+  animation: pop 0.3s ease;
+}
+.chip {
+  padding: 5px 11px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 12px; color: var(--blue);
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s; white-space: nowrap;
+}
+.chip:hover { background: var(--blue-light); border-color: var(--blue); }
+
+/* ── Qualification ── */
+.qual-screen { padding: 0 16px 0 54px; animation: pop 0.3s ease; }
+.qual-question { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+.qual-q2 { margin-top: 12px; }
+.qual-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.qual-btn {
+  padding: 8px 16px;
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px; color: var(--blue);
+  cursor: pointer; font-family: inherit; font-weight: 500;
+  transition: all 0.15s; white-space: nowrap;
+}
+.qual-btn:hover { background: var(--blue-light); border-color: var(--blue); }
+.qual-btn.selected { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* ── Input area ── */
+.chat-input-area {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.input-row { display: flex; gap: 8px; align-items: flex-end; }
+.input-field {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  font-size: 13.5px; font-family: inherit;
+  background: var(--body-bg);
+  color: var(--text-primary);
+  outline: none; resize: none;
+  max-height: 96px; line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.input-field:focus { border-color: var(--blue); }
+.input-field::placeholder { color: var(--text-muted); }
+.send-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%; background: var(--navy);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+.send-btn:hover { background: var(--blue); transform: scale(1.05); }
+.send-btn:active { transform: scale(0.95); }
+.send-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+.send-btn svg { fill: white; }
+.input-hint {
+  font-size: 11px; color: var(--text-muted);
+  text-align: center; margin-top: 7px;
+}
+
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .chat-wrapper { border-radius: 14px; height: calc(100vh - 32px); }
+}
+
+/* ── Note de satisfaction ── */
+.rating-widget { padding: 10px 16px 16px 54px; animation: pop 0.3s ease; }
+.rating-inner {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: inline-block;
+}
+.rating-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+.rating-stars { display: flex; gap: 6px; }
+.rating-star {
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.12s, transform 0.1s;
+  line-height: 1;
+  user-select: none;
+}
+.rating-star.hover, .rating-star.active { color: #F5A623; transform: scale(1.2); }
+.rating-thanks { font-size: 13px; color: var(--text-secondary); margin-top: 10px; display: none; }
+</style>
+
+<div class="chat-wrapper">
+  <div class="chat-header">
+    <div class="header-logo">MNT</div>
+    <div class="header-info">
+      <div class="header-name">Sarah</div>
+      <div class="header-sub">Assistante IA · Mutuelle Nationale Territoriale</div>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      En ligne
+    </div>
+  </div>
+
+  <div class="chat-messages" id="messages"></div>
+
+  <div class="chat-input-area">
+    <div class="input-row">
+      <textarea class="input-field" id="inputField" placeholder="Posez votre question à Sarah…" rows="1"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">Données hébergées en France 🇫🇷 · Les informations fournies sont indicatives et ne remplacent pas votre contrat</div>
+  </div>
+</div>
+
+<script>
+const WEBHOOK       = 'https://merignieux.app.n8n.cloud/webhook/mnt-chatbot';
+const WEBHOOK_EMAIL = 'https://merignieux.app.n8n.cloud/webhook/mnt-email';
+const INACTIVITY_MS = 3 * 60 * 1000; // 3 minutes
+
+const el = id => document.getElementById(id);
+let userPrenom = '';
+let userNumero = '';
+let userStatut = null;      // 'adherent' | 'prospect'
+let userTypeProduit = null; // 'sante' | 'gms' | 'ri' | 'obseques' | 'deces' | 'autre'
+let userTypeContrat = null; // 'individuel' | 'convention' (santé + GMS uniquement)
+let intakeDone = false;
+let emailPromptShown = false;
+let inactivityTimer = null;
+let conversationHistory = []; // { role, text }
+
+if (typeof marked !== 'undefined') marked.setOptions({ breaks: true, gfm: true });
+
+function md(text) {
+  return typeof marked !== 'undefined' ? marked.parse(text) : text.replace(/\n/g,'<br>');
+}
+function scroll() { const m = el('messages'); m.scrollTop = m.scrollHeight; }
+
+/* ── Historique ── */
+function trackMsg(role, text) {
+  conversationHistory.push({ role, text });
+}
+
+/* ── Messages ── */
+function addMsg(role, content, showForm = false) {
+  const wrap = document.createElement('div');
+  wrap.className = `message ${role}`;
+  if (role === 'sarah') {
+    wrap.innerHTML = `<div class="avatar">S</div><div>
+      <div class="bubble">${md(content)}</div>
+    </div>`;
+    trackMsg('Sarah', content);
+  } else {
+    wrap.innerHTML = `<div class="bubble">${content.replace(/</g,'&lt;')}</div>`;
+    trackMsg(userPrenom || 'Utilisateur', content);
+  }
+  el('messages').appendChild(wrap);
+  if (showForm) {
+    // Supprimer tout formulaire de rappel précédent pour éviter les doublons
+    document.querySelectorAll('.contact-form-standalone').forEach(f => f.remove());
+    // Ajouter le formulaire comme élément séparé, toujours visible en bas
+    const formEl = document.createElement('div');
+    formEl.className = 'contact-form-standalone';
+    formEl.style.cssText = 'padding: 0 16px 0 54px; animation: pop 0.3s ease;';
+    formEl.innerHTML = contactForm();
+    el('messages').appendChild(formEl);
+  }
+  scroll();
+}
+
+/* ── Timer d'inactivité ── */
+function resetInactivityTimer() {
+  if (!intakeDone || emailPromptShown) return;
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(handleInactivity, INACTIVITY_MS);
+}
+
+function handleInactivity() {
+  if (emailPromptShown || conversationHistory.length < 2) return;
+  emailPromptShown = true;
+  el('inputField').disabled = true;
+  el('sendBtn').disabled = true;
+
+  addMsg('sarah', 'Il semble que vous ayez terminé vos questions. Merci d\'avoir échangé avec moi !\n\nSouhaitez-vous recevoir un récapitulatif de notre conversation par email ?');
+
+  // Boutons Oui / Non
+  const btns = document.createElement('div');
+  btns.id = 'email-prompt-btns';
+  btns.style.cssText = 'padding: 4px 16px 4px 54px; display:flex; gap:8px; animation: pop 0.25s ease;';
+  btns.innerHTML = `
+    <button class="chip" style="background:var(--navy);color:white;border-color:var(--navy);" onclick="showEmailForm()">Oui, je veux le récapitulatif</button>
+    <button class="chip" onclick="declineEmail()">Non merci</button>`;
+  el('messages').appendChild(btns);
+  scroll();
+}
+
+function declineEmail() {
+  document.getElementById('email-prompt-btns')?.remove();
+  addMsg('sarah', 'Très bien ! Bonne journée **' + (userPrenom || '') + '** 😊\n\nN\'hésitez pas à revenir si vous avez d\'autres questions. L\'équipe MNT reste à votre disposition au **09 72 72 02 02**.');
+  showRating();
+}
+
+function showEmailForm() {
+  document.getElementById('email-prompt-btns')?.remove();
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'padding: 0 16px 0 54px; animation: pop 0.25s ease;';
+  wrapper.innerHTML = `<div class="contact-form" id="email-form">
+    <div class="contact-form-title">📧 Récapitulatif par email</div>
+    <div class="form-grid">
+      <div class="form-field full"><label>Adresse email *</label><input id="ef-email" type="email" placeholder="votre@email.fr" autofocus></div>
+    </div>
+    <div class="form-field full" style="margin-top:8px;">
+      <label style="display:flex;align-items:flex-start;gap:7px;text-transform:none;font-size:11.5px;color:var(--text-secondary);font-weight:400;cursor:pointer;">
+        <input type="checkbox" id="ef-rgpd" style="margin-top:2px;flex-shrink:0;">
+        <span>J'accepte que la MNT utilise mon adresse email pour m'envoyer ce récapitulatif. Conformément au RGPD, vous pouvez exercer vos droits à tout moment.</span>
+      </label>
+    </div>
+    <button class="form-submit" onclick="submitEmail()">Envoyer le récapitulatif →</button>
+  </div>`;
+  el('messages').appendChild(wrapper);
+  scroll();
+}
+
+async function submitEmail() {
+  const email = el('ef-email')?.value.trim();
+  const rgpd  = el('ef-rgpd')?.checked;
+  if (!email) { alert('Merci de renseigner votre adresse email.'); return; }
+  if (!rgpd)  { alert('Merci d\'accepter les conditions RGPD avant d\'envoyer.'); return; }
+
+  document.getElementById('email-form')?.closest('div')?.remove();
+  addMsg('sarah', 'Parfait ! Le récapitulatif de notre échange vous sera envoyé à **' + email + '** dans quelques instants.\n\nBonne journée **' + (userPrenom || '') + '** 😊');
+  showRating();
+
+  // Envoi au webhook n8n (créer workflow mnt-email séparément)
+  try {
+    const recap = conversationHistory.map(m => `**${m.role}** : ${m.text}`).join('\n\n---\n\n');
+    await fetch(WEBHOOK_EMAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, prenom: userPrenom, recap })
+    });
+  } catch(e) { /* silencieux — message de confirmation déjà affiché */ }
+}
+
+/* ── Formulaires ── */
+function intakeForm() {
+  return `<div class="contact-form" id="intake-form">
+    <div class="contact-form-title">✏️ Pour commencer</div>
+    <div class="form-grid">
+      <div class="form-field full"><label>Votre prénom *</label><input id="intake-prenom" type="text" placeholder="Marie" autofocus></div>
+    </div>
+    <button class="form-submit" onclick="submitIntake()">Continuer →</button>
+  </div>`;
+}
+
+function submitIntake() {
+  const prenom = el('intake-prenom')?.value.trim();
+  if (!prenom) { alert('Merci de renseigner votre prénom.'); return; }
+  userPrenom = prenom;
+  el('intake-form')?.closest('div[style]')?.remove();
+  addMsg('sarah', `Merci **${userPrenom}** !`);
+  showStatutQuestion();
+}
+
+/* ── Qualification ── */
+function showStatutQuestion() {
+  const wrapper = document.createElement('div');
+  wrapper.id = 'qual-wrapper';
+  wrapper.className = 'qual-screen';
+  wrapper.innerHTML = `
+    <div class="qual-question">Êtes-vous adhérent(e) à la MNT ?</div>
+    <div class="qual-buttons">
+      <button class="qual-btn" onclick="selectStatut('adherent', this)">✅ Je suis adhérent(e)</button>
+      <button class="qual-btn" onclick="selectStatut('prospect', this)">🔍 Je souhaite m'informer</button>
+    </div>`;
+  el('messages').appendChild(wrapper);
+  scroll();
+}
+
+function selectStatut(value, btn) {
+  userStatut = value;
+  btn.closest('.qual-buttons').querySelectorAll('.qual-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(() => {
+    if (value === 'adherent') showNumeroQuestion();
+    else showProduitQuestion();
+  }, 300);
+}
+
+function showNumeroQuestion() {
+  const wrapper = el('qual-wrapper');
+  const q2 = document.createElement('div');
+  q2.className = 'qual-q2';
+  q2.innerHTML = `
+    <div class="qual-question">N° adhérent</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input id="qual-numero" type="text" placeholder="12345678"
+        style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+        font-size:14px;background:var(--surface);color:var(--text-primary);outline:none;"
+        onkeydown="if(event.key==='Enter') confirmNumero()">
+      <button class="qual-btn" style="margin:0;white-space:nowrap;" onclick="confirmNumero()">Continuer →</button>
+    </div>`;
+  wrapper.appendChild(q2);
+  setTimeout(() => el('qual-numero')?.focus(), 100);
+  scroll();
+}
+
+function confirmNumero() {
+  userNumero = el('qual-numero')?.value.trim() || '';
+  showProduitQuestion();
+}
+
+function showProduitQuestion() {
+  const wrapper = el('qual-wrapper');
+  const q3 = document.createElement('div');
+  q3.className = 'qual-q2';
+  q3.innerHTML = `
+    <div class="qual-question">Votre demande concerne :</div>
+    <div class="qual-buttons" style="flex-wrap:wrap;">
+      <button class="qual-btn" onclick="selectProduit('sante', this)">💊 Santé</button>
+      <button class="qual-btn" onclick="selectProduit('gms', this)">🏥 GMS — Maintien de Salaire</button>
+      <button class="qual-btn" onclick="selectProduit('ri', this)">📋 Régime Indemnitaire</button>
+      <button class="qual-btn" onclick="selectProduit('obseques', this)">⚰️ Garantie Obsèques</button>
+      <button class="qual-btn" onclick="selectProduit('deces', this)">🖤 Décès</button>
+      <button class="qual-btn" onclick="selectProduit('autre', this)">❓ Autre</button>
+      <button class="qual-btn" style="border-color:#C0392B;color:#C0392B;" onclick="selectProduit('reclamation', this)">🚨 Réclamation</button>
+    </div>`;
+  wrapper.appendChild(q3);
+  scroll();
+}
+
+function selectProduit(value, btn) {
+  btn.closest('.qual-buttons').querySelectorAll('.qual-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(() => {
+    if (value === 'reclamation') {
+      handleReclamation();
+    } else {
+      userTypeProduit = value;
+      if (value === 'sante' || value === 'gms') showContratQuestion();
+      else startChat();
+    }
+  }, 300);
+}
+
+function showContratQuestion() {
+  const wrapper = el('qual-wrapper');
+  const q4 = document.createElement('div');
+  q4.className = 'qual-q2';
+  q4.innerHTML = `
+    <div class="qual-question">Votre contrat est :</div>
+    <div class="qual-buttons">
+      <button class="qual-btn" onclick="selectContrat('individuel', this)">👤 Individuel</button>
+      <button class="qual-btn" onclick="selectContrat('convention', this)">🏛️ Via mon employeur (convention)</button>
+    </div>`;
+  wrapper.appendChild(q4);
+  scroll();
+}
+
+function selectContrat(value, btn) {
+  userTypeContrat = value;
+  btn.closest('.qual-buttons').querySelectorAll('.qual-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(startChat, 400);
+}
+
+function handleReclamation() {
+  el('qual-wrapper')?.remove();
+  addMsg('sarah',
+    `Je suis désolée d'apprendre que vous rencontrez une difficulté, **${userPrenom}**.\n\nPour traiter votre réclamation dans les meilleurs délais, je vous mets en relation avec un conseiller MNT. Merci de renseigner vos coordonnées ci-dessous — notre équipe vous contactera sous 48h ouvrées.`,
+    true /* showForm FORMULAIRE_RAPPEL */
+  );
+}
+
+function startChat() {
+  el('qual-wrapper')?.remove();
+  intakeDone = true;
+
+  const labels = {
+    sante: 'complémentaire santé',
+    gms: 'Garantie Maintien de Salaire (GMS)',
+    ri: 'Régime Indemnitaire',
+    obseques: 'Garantie Frais d\'Obsèques',
+    deces: 'contrat Décès',
+    autre: 'votre question'
+  };
+  const labelProduit = labels[userTypeProduit] || 'votre demande';
+  const labelContrat = userTypeContrat === 'individuel' ? ' — contrat individuel' :
+                       userTypeContrat === 'convention' ? ' — convention de participation' : '';
+
+  let intro;
+  if (userStatut === 'prospect') {
+    intro = `Bonjour **${userPrenom}** ! Bienvenue à la MNT.\n\nJe vais vous donner des informations sur notre **${labelProduit}**. Pour tout projet personnalisé, nos conseillers sont disponibles sur **mnt.fr** ou au **09 72 72 02 02**. En quoi puis-je vous aider ?`;
+  } else {
+    intro = `Bonjour **${userPrenom}** ! Ravie de vous accueillir.\n\nJe vais vous aider pour votre **${labelProduit}**${labelContrat}. En quoi puis-je vous aider aujourd'hui ?`;
+  }
+
+  addMsg('sarah', intro);
+  el('inputField').disabled = false;
+  el('sendBtn').disabled = false;
+  el('inputField').focus();
+  resetInactivityTimer();
+}
+
+function contactForm() {
+  return `<div class="contact-form">
+    <div class="contact-form-title">📋 Vos coordonnées</div>
+    <div class="form-grid">
+      <div class="form-field"><label>Nom</label><input id="fc-nom" type="text" placeholder="Dupont"></div>
+      <div class="form-field"><label>Prénom</label><input id="fc-prenom" type="text" placeholder="Marie"></div>
+      <div class="form-field full"><label>Email</label><input id="fc-email" type="email" placeholder="marie.dupont@exemple.fr"></div>
+      <div class="form-field"><label>Téléphone</label><input id="fc-tel" type="tel" placeholder="06 00 00 00 00"></div>
+      <div class="form-field"><label>N° adhérent</label><input id="fc-num" type="text" placeholder="12345678"></div>
+    </div>
+    <div class="form-field full" style="margin-top:8px;">
+      <label style="display:flex;align-items:flex-start;gap:7px;text-transform:none;font-size:11.5px;color:var(--text-secondary);font-weight:400;cursor:pointer;">
+        <input type="checkbox" id="fc-rgpd" style="margin-top:2px;flex-shrink:0;">
+        <span>J'accepte que la MNT traite mes données personnelles afin d'être recontacté(e) par un conseiller. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression.</span>
+      </label>
+    </div>
+    <button class="form-submit" onclick="submitContact()">Envoyer mes coordonnées →</button>
+  </div>`;
+}
+
+function submitContact() {
+  const nom = el('fc-nom')?.value.trim();
+  const prenom = el('fc-prenom')?.value.trim();
+  const email = el('fc-email')?.value.trim();
+  const rgpd = el('fc-rgpd')?.checked;
+  if (!nom || !prenom || !email) { alert('Merci de renseigner au minimum votre nom, prénom et email.'); return; }
+  if (!rgpd) { alert('Merci d\'accepter les conditions RGPD avant d\'envoyer.'); return; }
+  document.querySelectorAll('.contact-form').forEach(f => f.remove());
+  addMsg('sarah', 'Merci **' + prenom + '** ! Vos coordonnées ont bien été transmises. Un conseiller MNT vous contactera dans les plus brefs délais.\n\nAvez-vous d\'autres questions ?');
+}
+
+/* ── Note de satisfaction ── */
+let ratingSelected = 0;
+
+function showRating() {
+  const widget = document.createElement('div');
+  widget.className = 'rating-widget';
+  widget.innerHTML = `
+    <div class="rating-inner">
+      <div class="rating-label">Comment évaluez-vous cette conversation ? (1 à 5 ★)</div>
+      <div class="rating-stars" id="rating-stars">
+        ${[1,2,3,4,5].map(n => `<span class="rating-star" data-n="${n}" onclick="submitRating(${n})">★</span>`).join('')}
+      </div>
+      <div class="rating-thanks" id="rating-thanks">Merci pour votre retour ! 🙏</div>
+    </div>`;
+  el('messages').appendChild(widget);
+  widget.querySelectorAll('.rating-star').forEach(star => {
+    star.addEventListener('mouseover', () => {
+      if (ratingSelected) return;
+      const n = +star.dataset.n;
+      widget.querySelectorAll('.rating-star').forEach(s =>
+        s.classList.toggle('hover', +s.dataset.n <= n));
+    });
+    star.addEventListener('mouseout', () => {
+      if (ratingSelected) return;
+      widget.querySelectorAll('.rating-star').forEach(s => s.classList.remove('hover'));
+    });
+  });
+  scroll();
+}
+
+function submitRating(n) {
+  if (ratingSelected) return;
+  ratingSelected = n;
+  document.querySelectorAll('.rating-star').forEach(s => {
+    s.classList.remove('hover');
+    s.classList.toggle('active', +s.dataset.n <= n);
+    s.style.cursor = 'default';
+  });
+  const thanks = el('rating-thanks');
+  if (thanks) thanks.style.display = 'block';
+  try {
+    fetch(WEBHOOK_EMAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'rating', note: n, prenom: userPrenom })
+    });
+  } catch(e) {}
+}
+
+/* ── Typing ── */
+function showTyping() {
+  const div = document.createElement('div');
+  div.id = 'typing'; div.className = 'typing-indicator';
+  div.innerHTML = `<div class="avatar">S</div><div class="typing-bubble">
+    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+  </div>`;
+  el('messages').appendChild(div);
+  scroll();
+}
+function removeTyping() { el('typing')?.remove(); }
+
+/* ── Détection urgence médicale (couche HTML, indépendante de n8n) ── */
+const URGENCE_PATTERNS = /\b(secours|urgence|samu|amu|pompier|15\b|112\b|18\b|mourir|je meurs|mort|noyade|accident grave|ne respire plus|mal.{0,20}respir|douleur.{0,20}poitrine|poitrine.{0,20}douleur|infarctus|avc|overdose|suicid|détresse|inconscient|arrêt cardia)/i;
+
+function isUrgence(text) { return URGENCE_PATTERNS.test(text); }
+
+const MSG_URGENCE = `🚨 **Situation d'urgence médicale détectée.**\n\nSi vous ou quelqu'un près de vous êtes en danger immédiat, appelez **immédiatement** :\n\n- **15** — SAMU (urgences médicales)\n- **112** — Numéro d'urgence européen\n- **18** — Pompiers\n\nNe restez pas seul(e). Les secours peuvent vous guider par téléphone jusqu'à leur arrivée. Votre vie passe avant tout.`;
+
+/* ── Envoi message ── */
+async function sendMessage() {
+  const q = el('inputField').value.trim();
+  if (!q) return;
+  el('inputField').value = '';
+  el('inputField').style.height = 'auto';
+  el('sendBtn').disabled = true;
+  addMsg('user', q);
+
+  // COUPE-CIRCUIT ABSOLU : urgence médicale détectée côté HTML, avant tout appel n8n
+  if (isUrgence(q)) {
+    removeTyping();
+    addMsg('sarah', MSG_URGENCE);
+    el('sendBtn').disabled = false;
+    el('inputField').focus();
+    return;
+  }
+
+  showTyping();
+  resetInactivityTimer();
+  const ctx = userPrenom ? `[Interlocuteur : ${userPrenom} (${userStatut || 'inconnu'})${userNumero ? ' | adhérent n°' + userNumero : ''}${userTypeProduit ? ' | produit : ' + userTypeProduit : ''}${userTypeContrat ? ' | contrat : ' + userTypeContrat : ''}] ` : '';
+  try {
+    // Envoyer l'historique des 12 derniers échanges (hors message courant)
+    const history = conversationHistory.slice(-13, -1).map(m => ({
+      role: m.role === 'Sarah' ? 'assistant' : 'user',
+      content: m.text
+    }));
+    const r = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: ctx + q,
+        history,
+        type_statut: userStatut,
+        type_produit: userTypeProduit,
+        type_contrat: userTypeContrat
+      })
+    });
+    const data = await r.json();
+    removeTyping();
+    const answer = data.answer || 'Je suis désolée, une erreur est survenue. Merci de réessayer.';
+    // Déclencher le formulaire si Sarah propose un rappel ou un contact
+    const showForm = answer.toLowerCase().includes('formulaire') || answer.includes('FORMULAIRE_RAPPEL');
+    // Nettoyer le mot-clé technique avant affichage
+    const cleanAnswer = answer.replace(/\nFORMULAIRE_RAPPEL/g, '').replace(/FORMULAIRE_RAPPEL/g, '').trim();
+    addMsg('sarah', cleanAnswer, showForm);
+  } catch(e) {
+    removeTyping();
+    // Si la question était une urgence médicale et que n8n a échoué, montrer le COUPE-CIRCUIT
+    if (isUrgence(q)) {
+      addMsg('sarah', MSG_URGENCE);
+    } else {
+      addMsg('sarah', 'Je suis désolée, je rencontre une difficulté technique. Merci de réessayer dans quelques instants, ou appelez directement la MNT au **09 72 72 02 02** — mon humain se fera un plaisir de vous répondre 😊');
+    }
+  }
+  el('sendBtn').disabled = false;
+  el('inputField').focus();
+  resetInactivityTimer();
+}
+
+el('inputField').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 96) + 'px';
+});
+el('inputField').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+/* ── Démarrage ── */
+el('inputField').disabled = true;
+el('sendBtn').disabled = true;
+
+setTimeout(() => {
+  addMsg('sarah', 'Bonjour, je suis Sarah, assistante IA en formation 🤖 — je suis actuellement en phase de démonstration et mes réponses sont à titre indicatif. Pour toute situation complexe, nos conseillers humains restent à votre disposition.\n\nAvant de commencer, merci de vous présenter :');
+  const formWrapper = document.createElement('div');
+  formWrapper.style.cssText = 'padding: 0 16px 0 54px; animation: pop 0.3s ease;';
+  formWrapper.innerHTML = intakeForm();
+  el('messages').appendChild(formWrapper);
+  scroll();
+}, 350);
+</script>
