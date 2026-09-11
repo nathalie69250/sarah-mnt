@@ -6,8 +6,10 @@
 <style>
 :root {
   --navy:        #002F72;
-  --blue:        #0057B8;
-  --blue-light:  #E8F1FB;
+  --green:       #C7D500;
+  --green-dark:  #6AC200;
+  --blue:        #67B3DC;
+  --blue-light:  #E1ECF5;
   --surface:     #FFFFFF;
   --surface-alt: #F4F7FC;
   --body-bg:     #EDF1F8;
@@ -18,7 +20,7 @@
   --border:      #D4DFF0;
   --shadow:      rgba(0,47,114,0.10);
   --badge-bg:    #E8F1FB;
-  --badge-text:  #0057B8;
+  --badge-text:  #002F72;
   --source-bg:   #FFF8E7;
   --source-text: #7A5800;
   --source-border:#EDD97C;
@@ -340,17 +342,17 @@ body {
 .search-btn {
   width: 40px; height: 40px;
   border-radius: 50%;
-  background: var(--navy);
+  background: var(--green);
   border: none;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s, transform 0.1s;
 }
-.search-btn:hover { background: var(--blue); transform: scale(1.05); }
+.search-btn:hover { background: var(--green-dark); transform: scale(1.05); }
 .search-btn:active { transform: scale(0.95); }
 .search-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
-.search-btn svg { fill: white; }
+.search-btn svg { fill: var(--navy); }
 .search-hint {
   font-size: 11px;
   color: var(--text-muted);
