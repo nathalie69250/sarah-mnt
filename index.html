@@ -597,7 +597,7 @@ function selectProduit(value, btn) {
       handleReclamation();
     } else {
       userTypeProduit = value;
-      if (value === 'sante' || value === 'gms') showContratQuestion();
+      if ((value === 'sante' || value === 'gms') && userStatut !== 'prospect') showContratQuestion();
       else startChat();
     }
   }, 300);
