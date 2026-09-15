@@ -570,7 +570,10 @@ function confirmNumero() {
 function showProduitQuestion() {
   const wrapper = el('qual-wrapper');
   const q3 = document.createElement('div');
-  q3.className = 'qual-q2';
+  q3.className = 'qual-q2';  const reclamationBtn = userStatut === 'adherent'
+    ? `<button class="qual-btn" style="border-color:#C0392B;color:#C0392B;" onclick="selectProduit('reclamation', this)">🚨 Réclamation</button>`
+    : '';
+
   q3.innerHTML = `
     <div class="qual-question">Votre demande concerne :</div>
     <div class="qual-buttons" style="flex-wrap:wrap;">
@@ -580,7 +583,7 @@ function showProduitQuestion() {
       <button class="qual-btn" onclick="selectProduit('obseques', this)">⚰️ Garantie Obsèques</button>
       <button class="qual-btn" onclick="selectProduit('deces', this)">🖤 Décès</button>
       <button class="qual-btn" onclick="selectProduit('autre', this)">❓ Autre</button>
-      <button class="qual-btn" style="border-color:#C0392B;color:#C0392B;" onclick="selectProduit('reclamation', this)">🚨 Réclamation</button>
+      ${reclamationBtn}
     </div>`;
   wrapper.appendChild(q3);
   scroll();
